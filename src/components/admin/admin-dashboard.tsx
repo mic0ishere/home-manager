@@ -5,6 +5,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Badge } from "@/components/ui/badge";
 
 import { UsersSection } from "./users-section";
+import { DoorLogsSection } from "./door-logs-section";
 
 export function AdminDashboard({ ownerId }: { ownerId: string }) {
   return (
@@ -21,11 +22,13 @@ export function AdminDashboard({ ownerId }: { ownerId: string }) {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-5xl px-4 py-8">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 space-y-10">
         <div className="grid gap-10 lg:grid-cols-2">
           <UsersSection ownerId={ownerId} />
           <Passkeys />
         </div>
+
+        <DoorLogsSection />
       </div>
     </main>
   );

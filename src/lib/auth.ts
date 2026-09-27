@@ -4,6 +4,7 @@ import { passkey } from "@better-auth/passkey";
 import { admin, magicLink } from "better-auth/plugins";
 
 import { ac, roles } from "./auth/permissions";
+import { doorLogsPlugin } from "./auth/door-logs-plugin";
 
 export const auth = betterAuth({
   appName: "Home Dashboard",
@@ -29,5 +30,6 @@ export const auth = betterAuth({
       adminRoles: ["owner"],
       roles,
     }),
+    doorLogsPlugin(),
   ],
 });

@@ -40,4 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 better-auth_migrations
-sqlite.db
+sqlite.db*
