@@ -110,7 +110,7 @@ export function GuestDashboard({
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="outline"
-                className="flex-1 justify-center h-11 text-sm font-medium"
+                className="flex-1 justify-center min-h-11 text-sm font-medium"
                 disabled={openingDoor !== null}
                 onClick={() => handleOpenDoor("main")}
               >
@@ -166,7 +166,7 @@ export function GuestDashboard({
 
             <div className="flex flex-col sm:flex-row gap-2">
               <Button
-                className="flex-1 text-xs"
+                className="flex-1 min-h-7 text-xs"
                 onClick={() => copyToClipboard(wifiPassword, "password")}
               >
                 {copiedField === "password" ? (
@@ -184,7 +184,7 @@ export function GuestDashboard({
 
               <Button
                 variant="outline"
-                className="flex-1 text-xs"
+                className="flex-1 min-h-7 text-xs"
                 onClick={() =>
                   copyToClipboard(
                     `Wi-Fi: ${wifiName}\nPassword: ${wifiPassword}`,
