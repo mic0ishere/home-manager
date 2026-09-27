@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Home Manager
 
-## Getting Started
+A home dashboard and access management web application built with Next.js (App Router), Better Auth, SQLite, Tailwind CSS, and shadcn UI.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 1. Project Overview & Scope
+
+Home Manager provides an authenticated portal for two distinct roles:
+
+- **Owner (Admin):**
+  - Exactly one owner account bootstrapped securely via seed script.
+  - Can authenticate via **Passkeys (WebAuthn)** or **Magic Links**.
+  - Access to the `/admin` console to manage guest users, register/revoke owner passkeys, and view an audit log of door opening events.
+- **Guest:**
+  - Created and managed by the owner.
+  - Authenticates via passwordless **Magic Links** (no password setup required).
+  - Access to the guest dashboard (`/`):
+    - **Remote Door Opening:** Remotely trigger unlocking for different entrances with visual feedback and broadcast notifications.
+    - **Wi-Fi Details:** View network SSID and password, with one-click copy actions.
+
+---
+
+## 2. Tech Stack
+
+- **Framework:** Next.js 16 (Turbopack, App Router, React 19)
+- **Authentication & Database:** [Better Auth](https://better-auth.com) with SQLite (`better-sqlite3`)
+  - Plugins: `admin`, `magicLink`, `passkey`, and a custom `doorLogsPlugin`
+- **UI & Styling:** Tailwind CSS v4, shadcn UI components (`@base-ui/react`), Lucide icons, Sonner toasts
+- **State & Data Fetching:** `@tanstack/react-query`
+
+---
+
+## 3. Environment Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+# URL where the application is accessible
+BETTER_AUTH_URL=http://localhost:3000
+
+# Secret key used for signing session cookies and tokens (generate with `openssl rand -base64 32`)
+BETTER_AUTH_SECRET=your-secure-random-secret
+
+# Initial owner credentials for the seed script
+OWNER_EMAIL=owner@example.com
+OWNER_NAME=Home Owner
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> **Note on Email Delivery:** In development, magic link sign-in URLs are logged directly to the server console via the `sendMagicLink` hook in `src/lib/auth.ts`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 4. Setup & Running the Project
 
-## Learn More
+### 1. Install Dependencies
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Apply Database Migrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run the Better Auth migration CLI to initialize or update the SQLite schema (users, sessions, accounts, passkeys, door logs):
 
-## Deploy on Vercel
+```bash
+pnpm dlx auth@latest migrate --config ./src/lib/auth.ts --yes
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Seed the Owner Account
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bootstrap the single owner account defined in your `.env`:
+
+```bash
+pnpm seed:owner
+```
+
+### 4. Start the Development Server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 5. Key Workflows & Routes
+
+| Route | Role | Description |
+|---|---|---|
+| `/sign-in` | Public | Passwordless magic link request + Passkey sign-in button. |
+| `/` | Authenticated (Guest / Owner) | Door opening buttons and Wi-Fi credentials card. |
+| `/admin` | Owner only | User management (add/delete guests), passkey configuration, and door opening audit table. |
+| `/api/open-door?id=<door-id>` | Authenticated | Validates session, logs unlock action to SQLite, waits 5s, and broadcasts completion. |
+| `/api/admin/door-logs` | Owner only | Dynamic paginated API returning door opening audit entries (up to 100/request). |
+
+---
+
+## 6. Development & Scripts
+
+- `pnpm dev` — Start the local Next.js development server.
+- `pnpm build` — Build the application for production.
+- `pnpm start` — Start the production server.
+- `pnpm lint` — Run ESLint across the codebase.
+- `pnpm seed:owner` — Idempotently seed/promote the owner user in the database.
+- `pnpm dlx auth@latest migrate --config ./src/lib/auth.ts --yes` — Apply Better Auth schema migrations.
