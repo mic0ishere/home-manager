@@ -16,13 +16,13 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 interface GuestDashboardProps {
-  initialWifiName?: string;
-  initialWifiPassword?: string;
+  wifiName?: string;
+  wifiPassword?: string;
 }
 
 export function GuestDashboard({
-  initialWifiName = "HomeManager-Guest",
-  initialWifiPassword = "welcome-home-2025",
+  wifiName = "HomeManager-Guest",
+  wifiPassword = "welcome-home",
 }: GuestDashboardProps) {
   const [openingDoor, setOpeningDoor] = React.useState<string | null>(null);
   const [lastDoorAlert, setLastDoorAlert] = React.useState<{
@@ -31,7 +31,9 @@ export function GuestDashboard({
     timestamp: Date;
   } | null>(null);
 
-  const [copiedField, setCopiedField] = React.useState<"all" | "password" | null>(null);
+  const [copiedField, setCopiedField] = React.useState<
+    "all" | "password" | null
+  >(null);
 
   async function handleOpenDoor(id: string) {
     if (openingDoor) return;
@@ -52,7 +54,8 @@ export function GuestDashboard({
       });
       toast.success(data.message || "Door opened");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Error opening door";
+      const errorMessage =
+        err instanceof Error ? err.message : "Error opening door";
       toast.error(errorMessage);
     } finally {
       setOpeningDoor(null);
@@ -66,7 +69,7 @@ export function GuestDashboard({
       toast.success(
         type === "all"
           ? "Wi-Fi network and password copied!"
-          : "Wi-Fi password copied!"
+          : "Wi-Fi password copied!",
       );
       setTimeout(() => setCopiedField(null), 2000);
     } catch {
@@ -150,13 +153,13 @@ export function GuestDashboard({
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Network (SSID)</span>
                 <span className="font-mono font-medium text-foreground">
-                  {initialWifiName}
+                  {wifiName}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t pt-2">
                 <span className="text-muted-foreground">Password</span>
                 <span className="font-mono font-medium text-foreground">
-                  {initialWifiPassword}
+                  {wifiPassword}
                 </span>
               </div>
             </div>
@@ -164,7 +167,7 @@ export function GuestDashboard({
             <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 className="flex-1 text-xs"
-                onClick={() => copyToClipboard(initialWifiPassword, "password")}
+                onClick={() => copyToClipboard(wifiPassword, "password")}
               >
                 {copiedField === "password" ? (
                   <>
@@ -184,8 +187,8 @@ export function GuestDashboard({
                 className="flex-1 text-xs"
                 onClick={() =>
                   copyToClipboard(
-                    `Wi-Fi: ${initialWifiName}\nPassword: ${initialWifiPassword}`,
-                    "all"
+                    `Wi-Fi: ${wifiName}\nPassword: ${wifiPassword}`,
+                    "all",
                   )
                 }
               >

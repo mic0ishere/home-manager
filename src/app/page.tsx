@@ -27,7 +27,10 @@ export default async function HomePage() {
           </span>
           <div className="flex items-center gap-2">
             {isOwner && (
-              <Link href="/admin" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+              <Link
+                href="/admin"
+                className={buttonVariants({ variant: "ghost", size: "sm" })}
+              >
                 Admin
               </Link>
             )}
@@ -47,7 +50,10 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <GuestDashboard />
+        <GuestDashboard
+          wifiName={process.env.NEXT_PUBLIC_WIFI_SSID}
+          wifiPassword={process.env.NEXT_PUBLIC_WIFI_PASSWORD}
+        />
       </div>
     </main>
   );
