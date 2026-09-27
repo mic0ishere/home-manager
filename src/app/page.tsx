@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { buttonVariants } from "@/components/ui/button";
+import { GuestDashboard } from "@/components/dashboard/guest-dashboard";
 import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
@@ -18,8 +19,8 @@ export default async function HomePage() {
   const isOwner = (role ?? "").split(",").includes("owner");
 
   return (
-    <main className="flex min-h-svh flex-col">
-      <header className="border-b">
+    <main className="flex min-h-svh flex-col bg-background">
+      <header className="border-b bg-card">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4">
           <span className="text-sm font-semibold tracking-tight">
             Home Manager
@@ -35,19 +36,18 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <div className="flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-xl border border-dashed p-10 text-center">
-          <h1 className="text-lg font-semibold tracking-tight">
-            Hello, {name || "there"}
+      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome, {name || "Guest"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {email}
             {isOwner && <span> · Owner</span>}
           </p>
-          <p className="mt-8 text-sm text-muted-foreground">
-            Home — nothing here yet.
-          </p>
         </div>
+
+        <GuestDashboard />
       </div>
     </main>
   );
