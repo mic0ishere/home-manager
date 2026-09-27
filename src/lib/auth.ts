@@ -12,6 +12,7 @@ export const auth = betterAuth({
     enabled: false,
     disableSignUp: true,
   },
+  trustedOrigins: ["http://192.168.1.*"],
   database: new Database("./sqlite.db"),
   plugins: [
     passkey(),
