@@ -192,7 +192,7 @@ export function UsersSection({ ownerId }: { ownerId: string }) {
               const created = formatCreatedAt(user.createdAt);
               return (
                 <Item key={user.id}>
-                  {index > 0 && <ItemSeparator />}
+                  {index > 0 && <ItemSeparator className="mb-2 -mt-2" />}
                   <ItemMedia>
                     <UserRoundIcon className="size-4" />
                   </ItemMedia>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { UsersSection } from "./users-section";
 import { DoorLogsSection } from "./door-logs-section";
+import Link from "next/link";
 
 export function AdminDashboard({ ownerId }: { ownerId: string }) {
   return (
@@ -13,9 +14,9 @@ export function AdminDashboard({ ownerId }: { ownerId: string }) {
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold tracking-tight">
+            <Link className="text-sm font-semibold tracking-tight" href="/">
               Home Manager
-            </span>
+            </Link>
             <Badge variant="secondary">Admin</Badge>
           </div>
           <SignOutButton />
