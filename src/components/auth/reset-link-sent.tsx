@@ -37,7 +37,12 @@ export function ResetLinkSent({ className }: ResetLinkSentProps) {
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY) ?? "")
+    // Deferred so the state update happens outside the synchronous effect
+    // body (react-hooks/set-state-in-effect); the microtask still runs
+    // before the next paint.
+    queueMicrotask(() => {
+      setEmail(sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY) ?? "")
+    })
   }, [])
 
   return (

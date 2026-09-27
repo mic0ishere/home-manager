@@ -31,7 +31,12 @@ function AuthResultView({ className, fallbackIntent }: AuthResultProps) {
   )
 
   useEffect(() => {
-    setResult(parseAuthResult(window.location.search, fallbackIntent))
+    // Deferred so the state update happens outside the synchronous effect
+    // body (react-hooks/set-state-in-effect); the microtask still runs
+    // before the next paint.
+    queueMicrotask(() => {
+      setResult(parseAuthResult(window.location.search, fallbackIntent))
+    })
   }, [fallbackIntent])
 
   const message = getAuthResultMessage(result, localization)

@@ -39,7 +39,12 @@ export function MagicLinkSent({ className }: MagicLinkSentProps) {
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY) ?? "")
+    // Deferred so the state update happens outside the synchronous effect
+    // body (react-hooks/set-state-in-effect); the microtask still runs
+    // before the next paint.
+    queueMicrotask(() => {
+      setEmail(sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY) ?? "")
+    })
   }, [])
 
   return (

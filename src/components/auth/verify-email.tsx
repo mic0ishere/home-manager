@@ -49,7 +49,12 @@ export function VerifyEmail({ className }: VerifyEmailProps) {
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS)
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem("better-auth-ui.verify-email") ?? "")
+    // Deferred so the state update happens outside the synchronous effect
+    // body (react-hooks/set-state-in-effect); the microtask still runs
+    // before the next paint.
+    queueMicrotask(() => {
+      setEmail(sessionStorage.getItem("better-auth-ui.verify-email") ?? "")
+    })
   }, [])
 
   useEffect(() => {

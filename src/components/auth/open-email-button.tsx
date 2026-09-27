@@ -4,7 +4,6 @@ import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import type { VariantProps } from "class-variance-authority"
 import { QrCode } from "lucide-react"
-import { useMemo } from "react"
 
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -50,10 +49,7 @@ export function OpenEmailButton({
 
   const provider = getEmailProviderLink(email)
   const loginUrl = provider?.loginUrl
-  const qrCode = useMemo(
-    () => (loginUrl ? createQrCodeSvgData(loginUrl) : null),
-    [loginUrl]
-  )
+  const qrCode = loginUrl ? createQrCodeSvgData(loginUrl) : null
 
   if (!provider || !qrCode) return null
 
