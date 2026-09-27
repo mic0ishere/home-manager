@@ -27,8 +27,18 @@ export const auth = betterAuth({
       // magic link must never sign up a new user.
       disableSignUp: true,
       sendMagicLink: async ({ email, url }) => {
+        const isEmailDeliveryEnabled =
+          process.env.ENABLE_EMAIL_DELIVERY === "true" ||
+          (process.env.NODE_ENV === "production" &&
+            process.env.ENABLE_EMAIL_DELIVERY !== "false");
+
+        if (!isEmailDeliveryEnabled) {
+          console.log(`[Magic Link] Send link to ${email}: ${url}`);
+          return;
+        }
+
         const { data, error } = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || "Home Manager",
+          from: process.env.RESEND_FROM_EMAIL || "Home Manager <home@example.com>",
           to: email,
           subject: "Your Home Manager sign-in link",
           react: createElement(MagicLinkEmail, {
@@ -54,9 +64,9 @@ export const auth = betterAuth({
         });
 
         if (error) {
-          console.error("Failed to send magic link email:", error);
+          console.error("Failed to send magic link email via Resend:", error);
         } else {
-          console.log("Sent magic link email:", data);
+          console.log("Sent magic link email via Resend:", data);
         }
       },
     }),
