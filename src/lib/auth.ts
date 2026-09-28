@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
-import Database from "better-sqlite3";
 import { passkey } from "@better-auth/passkey";
 import { admin, magicLink } from "better-auth/plugins";
+
+import { Pool } from "pg"
 
 import { Resend } from "resend";
 import { MagicLinkEmail } from "@better-auth-ui/react/email";
@@ -19,7 +20,9 @@ export const auth = betterAuth({
     disableSignUp: true,
   },
   trustedOrigins: ["http://192.168.1.*"],
-  database: new Database("./sqlite.db"),
+  database: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
   plugins: [
     passkey(),
     magicLink({
@@ -38,7 +41,8 @@ export const auth = betterAuth({
         }
 
         const { data, error } = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || "Home Manager <home@example.com>",
+          from:
+            process.env.RESEND_FROM_EMAIL || "Home Manager <home@example.com>",
           to: email,
           subject: "Your Home Manager sign-in link",
           react: createElement(MagicLinkEmail, {
