@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { buttonVariants } from "@/components/ui/button";
 import { GuestDashboard } from "@/components/dashboard/guest-dashboard";
 import { auth } from "@/lib/auth";
+import { getDoorsConfig } from "@/lib/door-proxy";
 
 export default async function HomePage() {
   // The proxy already redirects unauthenticated visitors; this keeps the
@@ -17,6 +18,8 @@ export default async function HomePage() {
 
   const { name, email, role } = session.user;
   const isOwner = (role ?? "").split(",").includes("owner");
+
+  const doorsConfig = await getDoorsConfig();
 
   return (
     <main className="flex min-h-svh flex-col bg-background">
@@ -51,6 +54,7 @@ export default async function HomePage() {
         </div>
 
         <GuestDashboard
+          doors={doorsConfig}
           wifiName={process.env.NEXT_PUBLIC_WIFI_SSID}
           wifiPassword={process.env.NEXT_PUBLIC_WIFI_PASSWORD}
         />

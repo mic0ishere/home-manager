@@ -3,6 +3,7 @@
 import * as React from "react";
 import { DoorClosed, DoorOpen, Check, Copy, Wifi } from "lucide-react";
 import { toast } from "sonner";
+import type { DoorConfig } from "@/lib/types";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,13 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 interface GuestDashboardProps {
+  doors: DoorConfig[];
   wifiName?: string;
   wifiPassword?: string;
 }
 
 export function GuestDashboard({
+  doors,
   wifiName = "HomeManager-Guest",
   wifiPassword = "welcome-home",
 }: GuestDashboardProps) {
@@ -35,24 +38,29 @@ export function GuestDashboard({
     "all" | "password" | null
   >(null);
 
-  async function handleOpenDoor(id: string) {
+  async function handleOpenDoor(doorId: string) {
     if (openingDoor) return;
-    setOpeningDoor(id);
+    setOpeningDoor(doorId);
 
     try {
-      const res = await fetch(`/api/open-door?id=${id}`);
+      const res = await fetch(`/api/open-door?id=${doorId}`);
       const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.error || "Failed to open door");
       }
 
+      const doorDetails = doors?.find((door) => door.doorId === doorId);
+
+      const message =
+        data.message || `${doorDetails?.name || doorId} door opened`;
+
       setLastDoorAlert({
-        id,
-        message: data.message || `${id} door opened`,
+        id: doorId,
+        message: message,
         timestamp: new Date(),
       });
-      toast.success(data.message || "Door opened");
+      toast.success(message);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error opening door";
@@ -107,25 +115,34 @@ export function GuestDashboard({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                variant="outline"
-                className="flex-1 justify-center min-h-11 text-sm font-medium"
-                disabled={openingDoor !== null}
-                onClick={() => handleOpenDoor("main")}
-              >
-                {openingDoor === "main" ? (
-                  <>
-                    <Spinner className="mr-2 size-4" />
-                    Opening Main Door...
-                  </>
-                ) : (
-                  <>
-                    <DoorOpen className="mr-2 size-4 text-primary" />
-                    Open Main Door
-                  </>
-                )}
-              </Button>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+              {doors?.length > 0 ? (
+                doors?.map((door) => (
+                  <Button
+                    key={door.doorId}
+                    variant="outline"
+                    className="flex-1 justify-center min-h-11 text-sm font-medium"
+                    disabled={openingDoor !== null}
+                    onClick={() => handleOpenDoor(door.doorId)}
+                  >
+                    {openingDoor === door.doorId ? (
+                      <>
+                        <Spinner className="mr-2 size-4" />
+                        Opening {door.name} Door...
+                      </>
+                    ) : (
+                      <>
+                        <DoorOpen className="mr-2 size-4 text-primary" />
+                        Open {door.name} Door
+                      </>
+                    )}
+                  </Button>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No doors configured. Please contact your administrator.
+                </p>
+              )}
             </div>
 
             {openingDoor && (

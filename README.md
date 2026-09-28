@@ -36,6 +36,9 @@ Home Manager provides an authenticated portal for two distinct roles:
 Create a `.env` file in the root directory:
 
 ```env
+# Database connection string for PostgreSQL
+DATABASE_URL=postgresql://username:password@localhost:5432/home_manager
+
 # Secret key used for signing session cookies and tokens (generate with `openssl rand -base64 32`)
 BETTER_AUTH_SECRET=your-secure-random-secret
 # Base URL of your app
@@ -48,6 +51,10 @@ OWNER_NAME="Home Owner"
 # Wifi credentials displayed on the guest dashboard
 NEXT_PUBLIC_WIFI_SSID=YourWifiName
 NEXT_PUBLIC_WIFI_PASSWORD=YourWifiPassword
+
+# Door control proxy configuration
+DOOR_CONTROL_PROXY_HOST=http://localhost:4000
+DOOR_CONTROL_PROXY_AUTH_TOKEN=your_secure_token
 
 # Resend email configuration
 RESEND_API_KEY=re_your_api_key
@@ -96,7 +103,37 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 5. Key Workflows & Routes
+
+## 5. Door Control Proxy
+
+**Since every home is different, the door control proxy is not included in this repository.** You need to implement your own proxy that listens for requests from Home Manager and communicates with your door hardware.
+
+> **Note:** Entire proxy calling logic is contained in [src/lib/door-proxy.ts](src/lib/door-proxy.ts).
+
+### Implementation Notes:
+
+- **Authentication:** Validate `Authorization: Bearer <DOOR_CONTROL_PROXY_AUTH_TOKEN>` header
+- **Endpoints:**
+  - `GET /doors-config` - Returns 200 OK with JSON array of available doors (see `DoorConfig` type below).
+  - `GET /open-door?id=<door-id>` - Returns 200 OK on success, no body required. All other responses are treated as failures.
+
+### Types
+
+```ts
+interface DoorConfig {
+  id: string; // Unique door identifier (e.g., "main", "garage")
+  name: string; // Human-readable name (e.g., "Main Entrance", "Garage Door")
+  description?: string; // Optional description of the door
+}
+
+interface DoorsConfigResponse {
+  doors: DoorConfig[];
+}
+```
+
+---
+
+## 6. Key Workflows & Routes
 
 | Route | Role | Description |
 |---|---|---|
@@ -108,7 +145,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 6. Development & Scripts
+## 7. Development & Scripts
 
 - `pnpm dev` — Start the local Next.js development server.
 - `pnpm build` — Build the application for production.
