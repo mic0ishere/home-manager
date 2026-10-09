@@ -7,6 +7,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   pixelBasedPreset,
@@ -29,35 +30,25 @@ export interface WelcomeEmailProps {
   email?: string;
   /** Name of the invited guest */
   name?: string;
-  /** Name of the application */
+  /** Name of the application sending the email */
   appName?: string;
   /** Website URL */
   siteUrl?: string;
-  /** Expiration time in minutes */
+  /** Number of minutes until the magic link expires */
   expirationMinutes?: number;
-  /** Custom CSS class names */
+  /** Logo URL(s) - a single string or light/dark variants. */
+  logoURL?: string | { light: string; dark: string };
+  /** Custom CSS class names for styling specific parts of the email */
   classNames?: EmailClassNames;
-  /** Custom color scheme */
+  /** Custom color scheme for light and dark modes */
   colors?: EmailColors;
-  /** Dark mode enabled */
+  /** Whether to show the "Powered by better-auth" footer */
+  poweredBy?: boolean;
+  /** Whether to enable dark mode support */
   darkMode?: boolean;
-  /** Additional React nodes to inject into head */
+  /** Additional React nodes to inject into the email head */
   head?: ReactNode;
 }
-
-const defaultWelcomeColors: EmailColors = {
-  light: {
-    background: "#FFFFFF",
-    border: "#E5E5E5",
-    card: "#FFFFFF",
-    cardForeground: "#0A0A0A",
-    foreground: "#0A0A0A",
-    muted: "#F5F5F5",
-    mutedForeground: "#737373",
-    primary: "#007595",
-    primaryForeground: "#ECFEFF",
-  },
-};
 
 export const WelcomeEmail = ({
   url,
@@ -66,21 +57,27 @@ export const WelcomeEmail = ({
   appName = "Home Manager",
   siteUrl = "https://home.mic0.me",
   expirationMinutes = 5,
-  colors = defaultWelcomeColors,
+  logoURL,
+  colors,
   classNames,
-  darkMode = false,
+  darkMode = true,
+  poweredBy,
   head,
 }: WelcomeEmailProps) => {
   const displaySite = siteUrl.replace(/^https?:\/\//, "");
   const previewText = `Welcome to ${appName}! Access doors and Wi-Fi at ${displaySite}.`;
-  const greeting = name ? `Welcome, ${name}!` : `Welcome to ${appName}!`;
+  const headingTitle = name
+    ? `Welcome to ${appName}, ${name}`
+    : `Welcome to ${appName}`;
 
   return (
     <Html>
       <Head>
         <meta content="light dark" name="color-scheme" />
         <meta content="light dark" name="supported-color-schemes" />
+
         <EmailStyles colors={colors} darkMode={darkMode} />
+
         {head}
       </Head>
 
@@ -96,34 +93,60 @@ export const WelcomeEmail = ({
           >
             <Section
               className={cn(
-                "bg-card text-card-foreground rounded-lg border border-border p-8",
+                "bg-card text-card-foreground rounded-none border border-border p-8",
                 classNames?.card,
               )}
             >
-              <Text className="m-0 mb-2 text-xs font-semibold uppercase tracking-wider text-primary">
-                {appName}
-              </Text>
+              {logoURL &&
+                (typeof logoURL === "string" ? (
+                  <Img
+                    src={logoURL}
+                    width={48}
+                    height={48}
+                    alt={appName}
+                    className={cn("mx-auto mb-8", classNames?.logo)}
+                  />
+                ) : (
+                  <>
+                    <Img
+                      src={logoURL.light}
+                      width={48}
+                      height={48}
+                      alt={appName}
+                      className={cn(
+                        "mx-auto mb-8 logo-light",
+                        classNames?.logo,
+                      )}
+                    />
+                    <Img
+                      src={logoURL.dark}
+                      width={48}
+                      height={48}
+                      alt={appName}
+                      className={cn(
+                        "hidden mx-auto mb-8 logo-dark",
+                        classNames?.logo,
+                      )}
+                    />
+                  </>
+                ))}
 
               <Heading
                 className={cn(
-                  "m-0 mb-4 text-2xl font-bold tracking-tight text-foreground",
+                  "m-0 mb-5 text-2xl font-semibold",
                   classNames?.title,
                 )}
               >
-                {greeting}
+                {headingTitle}
               </Heading>
 
               <Text
-                className={cn(
-                  "m-0 mb-6 text-sm leading-relaxed text-muted-foreground",
-                  classNames?.content,
-                )}
+                className={cn("m-0 text-sm font-normal", classNames?.content)}
               >
-                You have been invited as a guest with access to our home
-                dashboard at{" "}
+                You have been invited as a guest with access to the dashboard at{" "}
                 <Link
                   href={siteUrl}
-                  className="font-medium text-primary underline"
+                  className={cn("text-primary font-medium", classNames?.link)}
                 >
                   {displaySite}
                 </Link>
@@ -131,86 +154,130 @@ export const WelcomeEmail = ({
               </Text>
 
               {/* What you can do section */}
-              <Section className="my-6 rounded-md border border-border bg-muted p-5">
-                <Heading
-                  as="h3"
-                  className="m-0 mb-3 text-sm font-semibold text-foreground"
+              <Section
+                className={cn(
+                  "my-6 border border-border bg-muted p-4",
+                  classNames?.codeBlock,
+                )}
+              >
+                <Text
+                  className={cn(
+                    "m-0 mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
+                    classNames?.description,
+                  )}
                 >
-                  What you can do on the dashboard
-                </Heading>
+                  What you can do
+                </Text>
 
-                <Section className="mb-3">
-                  <Text className="m-0 text-sm font-medium text-foreground">
+                <Section className="mb-4">
+                  <Text
+                    className={cn(
+                      "m-0 text-sm font-semibold text-card-foreground",
+                      classNames?.content,
+                    )}
+                  >
                     🚪 Unlock Doors
                   </Text>
-                  <Text className="m-0 mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Remotely open and unlock house entrances from your device with a single click.
+                  <Text
+                    className={cn(
+                      "m-0 mt-1 text-xs text-muted-foreground",
+                      classNames?.description,
+                    )}
+                  >
+                    Remotely unlock house entrances directly from your device.
                   </Text>
                 </Section>
 
                 <Section>
-                  <Text className="m-0 text-sm font-medium text-foreground">
+                  <Text
+                    className={cn(
+                      "m-0 text-sm font-semibold text-card-foreground",
+                      classNames?.content,
+                    )}
+                  >
                     📶 View Wi-Fi Details
                   </Text>
-                  <Text className="m-0 mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Instantly view the guest Wi-Fi network name and copy the
-                    password to get connected right away.
+                  <Text
+                    className={cn(
+                      "m-0 mt-1 text-xs text-muted-foreground",
+                      classNames?.description,
+                    )}
+                  >
+                    View the guest Wi-Fi network credentials and copy the
+                    password with a single click.
                   </Text>
                 </Section>
               </Section>
 
               {/* Instructions on how to sign in */}
-              <Section className="my-6 rounded-md border border-border bg-card p-5">
-                <Heading
-                  as="h3"
-                  className="m-0 mb-2 text-sm font-semibold text-foreground"
+              <Section
+                className={cn(
+                  "my-6 border border-border bg-muted p-4",
+                  classNames?.codeBlock,
+                )}
+              >
+                <Text
+                  className={cn(
+                    "m-0 mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
+                    classNames?.description,
+                  )}
                 >
                   How to sign in
-                </Heading>
-                <Text className="m-0 mb-2 text-xs leading-relaxed text-muted-foreground">
-                  <strong>One-Click Sign In:</strong> Click the button below to
-                  instantly sign in to the dashboard. No password is required,
-                  and you will be securely logged in.
                 </Text>
-                <Text className="m-0 text-xs leading-relaxed text-muted-foreground">
-                  <strong>Future Visits:</strong> Whenever you need to access
-                  the dashboard again, visit{" "}
+
+                <Text
+                  className={cn(
+                    "m-0 mb-2 text-xs leading-relaxed text-muted-foreground",
+                    classNames?.description,
+                  )}
+                >
+                  • <strong>One-Click Sign In:</strong> Click the button below
+                  to immediately sign in using your one-time magic link — no
+                  password needed.
+                </Text>
+                <Text
+                  className={cn(
+                    "m-0 text-xs leading-relaxed text-muted-foreground",
+                    classNames?.description,
+                  )}
+                >
+                  • <strong>Future Visits:</strong> Whenever you need to return,
+                  visit{" "}
                   <Link
                     href={siteUrl}
-                    className="font-medium text-primary underline"
+                    className={cn("text-primary font-medium", classNames?.link)}
                   >
                     {displaySite}
                   </Link>
-                  , enter your email{email && ` (${email})`}, and we will send
-                  a fresh sign-in link to your inbox.
+                  , enter your email ({email || "guest@example.com"}), and you
+                  will receive a fresh sign-in link.
                 </Text>
               </Section>
 
-              {/* Primary Call to Action */}
-              <Section className="my-6 text-center">
+              <Section className="my-6">
                 <Button
                   href={url}
                   className={cn(
-                    "inline-block rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground no-underline shadow-sm",
+                    "inline-block whitespace-nowrap rounded-none text-sm font-medium py-2.5 px-6 bg-primary text-primary-foreground no-underline",
                     classNames?.button,
                   )}
                 >
-                  Sign In to Home Manager
+                  Sign in to {appName}
                 </Button>
               </Section>
 
               <Text
                 className={cn(
-                  "m-0 mb-2 text-xs text-muted-foreground",
+                  "m-0 mb-3 text-xs text-muted-foreground",
                   classNames?.description,
                 )}
               >
-                Or copy and paste this sign-in URL into your browser:
+                Or copy and paste this URL into your browser:
               </Text>
 
               <Link
                 className={cn(
-                  "break-all text-xs text-primary underline",
+                  "break-all text-xs text-primary",
                   classNames?.link,
                 )}
                 href={url}
@@ -225,14 +292,19 @@ export const WelcomeEmail = ({
                 )}
               />
 
-              <Text
-                className={cn(
-                  "m-0 mb-2 text-xs text-muted-foreground",
-                  classNames?.description,
-                )}
-              >
-                This sign-in link expires in {expirationMinutes} minutes.
-              </Text>
+              {expirationMinutes || appName ? (
+                <Text
+                  className={cn(
+                    "m-0 mb-3 text-xs text-muted-foreground",
+                    classNames?.description,
+                  )}
+                >
+                  {expirationMinutes
+                    ? `This link expires in ${expirationMinutes} minutes.`
+                    : null}
+                  {appName ? ` Email sent by ${appName}.` : null}
+                </Text>
+              ) : null}
 
               <Text
                 className={cn(
@@ -240,9 +312,28 @@ export const WelcomeEmail = ({
                   classNames?.description,
                 )}
               >
-                If you did not expect this invitation, please ignore this email.
-                No action is required on your part.
+                If you didn&apos;t request this email, you can safely ignore it.
               </Text>
+
+              {poweredBy && (
+                <Text
+                  className={cn(
+                    "m-0 mt-4 text-center text-[11px] text-muted-foreground",
+                    classNames?.poweredBy,
+                  )}
+                >
+                  Powered by{" "}
+                  <Link
+                    href="https://better-auth.com"
+                    className={cn(
+                      "text-primary underline",
+                      classNames?.link,
+                    )}
+                  >
+                    better-auth
+                  </Link>
+                </Text>
+              )}
             </Section>
           </Container>
         </Body>

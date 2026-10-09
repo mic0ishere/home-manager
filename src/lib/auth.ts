@@ -50,6 +50,20 @@ export const auth = betterAuth({
           return;
         }
 
+        const emailColors = {
+          light: {
+            background: "#FFFFFF",
+            border: "#E5E5E5",
+            card: "#FFFFFF",
+            cardForeground: "#0A0A0A",
+            foreground: "#0A0A0A",
+            muted: "#F5F5F5",
+            mutedForeground: "#737373",
+            primary: "#007595",
+            primaryForeground: "#ECFEFF",
+          },
+        };
+
         const emailElement = isWelcome
           ? createElement(WelcomeEmail, {
               url,
@@ -58,6 +72,8 @@ export const auth = betterAuth({
               appName: "Home Manager",
               siteUrl: process.env.BETTER_AUTH_URL,
               expirationMinutes: 5,
+              darkMode: false,
+              colors: emailColors,
             })
           : createElement(MagicLinkEmail, {
               url: url,
@@ -65,19 +81,7 @@ export const auth = betterAuth({
               email: email,
               expirationMinutes: 5,
               darkMode: false,
-              colors: {
-                light: {
-                  background: "#FFFFFF",
-                  border: "#E5E5E5",
-                  card: "#FFFFFF",
-                  cardForeground: "#0A0A0A",
-                  foreground: "#0A0A0A",
-                  muted: "#F5F5F5",
-                  mutedForeground: "#737373",
-                  primary: "#007595",
-                  primaryForeground: "#ECFEFF",
-                },
-              },
+              colors: emailColors,
             });
 
         const subject = isWelcome
