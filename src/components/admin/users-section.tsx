@@ -115,7 +115,15 @@ export function UsersSection({ ownerId }: { ownerId: string }) {
       // Welcome sign-in link. In dev this is printed to the server console
       // by the `sendMagicLink` callback; with a real email provider it is
       // delivered by the same call.
-      await authClient.signIn.magicLink({ email: input.email, callbackURL: "/" });
+      await authClient.signIn.magicLink({
+        email: input.email,
+        name: input.name,
+        callbackURL: "/",
+        metadata: {
+          type: "welcome",
+          name: input.name,
+        },
+      });
       return data;
     },
     onSuccess: () => {
