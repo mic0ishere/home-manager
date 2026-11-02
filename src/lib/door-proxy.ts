@@ -31,7 +31,6 @@ function getDoorProxyAuthHeaders() {
 
 export async function getDoorsConfig(): Promise<DoorConfig[]> {
   const url = getDoorProxyUrl("doors-config");
-  console.log(url);
   const proxyResponse = await fetch(url, {
     method: "GET",
     headers: getDoorProxyAuthHeaders(),
