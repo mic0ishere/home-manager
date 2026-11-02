@@ -52,8 +52,7 @@ export function GuestDashboard({
 
       const doorDetails = doors?.find((door) => door.doorId === doorId);
 
-      const message =
-        data.message || `${doorDetails?.name || doorId} door opened`;
+      const message = data.message || `${doorDetails?.name || doorId} opened`;
 
       setLastDoorAlert({
         id: doorId,
@@ -124,23 +123,24 @@ export function GuestDashboard({
                     className="flex-1 justify-center min-h-11 text-sm font-medium"
                     disabled={openingDoor !== null}
                     onClick={() => handleOpenDoor(door.doorId)}
+                    title={door.description || `Open ${door.name}`}
                   >
                     {openingDoor === door.doorId ? (
                       <>
                         <Spinner className="mr-2 size-4" />
-                        Opening {door.name} Door...
+                        Opening {door.name}...
                       </>
                     ) : (
                       <>
                         <DoorOpen className="mr-2 size-4 text-primary" />
-                        Open {door.name} Door
+                        Open {door.name}
                       </>
                     )}
                   </Button>
                 ))
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  No doors configured. Please contact your administrator.
+                  No doors found. Please contact your administrator.
                 </p>
               )}
             </div>

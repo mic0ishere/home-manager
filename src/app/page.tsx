@@ -19,7 +19,10 @@ export default async function HomePage() {
   const { name, email, role } = session.user;
   const isOwner = (role ?? "").split(",").includes("owner");
 
-  const doorsConfig = await getDoorsConfig();
+  const doorsConfig = await getDoorsConfig().catch((err) => {
+    console.error("Failed to fetch doors config:", err);
+    return [];
+  });
 
   return (
     <main className="flex min-h-svh flex-col bg-background">

@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   if (!doorUnlocked.success) {
     return NextResponse.json(
       {
-        error: `Failed to unlock door ${doorId}: ${doorUnlocked.error || "Unknown error"}`,
+        error: `Failed to unlock ${doorId}: ${doorUnlocked.error || "Unknown error"}`,
       },
       { status: 500 },
     );
@@ -61,6 +61,6 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    message: `${doorDetails.name} door opened`,
+    message: `${doorDetails.name} opened`,
   });
 }

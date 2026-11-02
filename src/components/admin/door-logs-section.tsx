@@ -63,7 +63,7 @@ function formatLogTimestamp(value?: string | Date) {
 
 export function DoorLogsSection() {
   const [page, setPage] = useState(1);
-  const pageSize = 100;
+  const pageSize = 20;
 
   const { data, isPending, isFetching, isError, error, refetch } =
     useQuery<DoorLogsResponse>({
