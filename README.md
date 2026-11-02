@@ -115,13 +115,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Authentication:** Validate `Authorization: Bearer <DOOR_CONTROL_PROXY_AUTH_TOKEN>` header
 - **Endpoints:**
   - `GET /doors-config` - Returns 200 OK with JSON array of available doors (see `DoorConfig` type below).
-  - `GET /open-door?id=<door-id>` - Returns 200 OK on success, no body required. All other responses are treated as failures.
+  - `GET /open-door?id=<doorId>` - Returns 200 OK on success, no body required. All other responses are treated as failures.
 
 ### Types
 
 ```ts
 interface DoorConfig {
-  id: string; // Unique door identifier (e.g., "main", "garage")
+  doorId: string; // Unique door identifier (e.g., "main", "garage")
   name: string; // Human-readable name (e.g., "Main Entrance", "Garage Door")
   description?: string; // Optional description of the door
 }
